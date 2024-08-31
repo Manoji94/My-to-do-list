@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './ToDo.css';
 
 function ToDo() {
     const [task, setTask] = useState('');
-    const [tasks, setTasks] = useState([
-        { text: 'Hit the gym', completed: false },
-        { text: 'Pay bills', completed: true },
-        { text: 'Buy eggs', completed: false },
-        { text: 'Read a book', completed: false },
-        { text: 'Organize office', completed: false },
-    ]);
+    const [tasks, setTasks] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [currentTask, setCurrentTask] = useState(null);
+
+    // Use the production URL for the API
+    const API_URL = 'https://mjkr94.pythonanywhere.com/api/react/';
+
+    useEffect(() => {
+        axios.get(API_URL)
+            .then(response => setTasks(response.data))
+            .catch(error => console.error('Error fetching tasks:', error));
+    }, []);
 
     const handleChange = (event) => {
         setTask(event.target.value);
@@ -23,7 +27,9 @@ function ToDo() {
             if (isEditing) {
                 handleUpdateTask(task);
             } else {
-                setTasks([...tasks, { text: task, completed: false }]);
+                axios.post(API_URL, { text: task, checked: false })
+                    .then(response => setTasks([...tasks, response.data]))
+                    .catch(error => console.error('Error adding task:', error));
             }
             setTask('');
             setIsEditing(false);
@@ -36,13 +42,17 @@ function ToDo() {
             setIsEditing(false);
             setTask('');
         }
-        setTasks(tasks.filter((_, i) => i !== index));
+        axios.delete(`https://mjkr94.pythonanywhere.com/api/delete-item/${taskToRemove.id}/`)
+            .then(() => setTasks(tasks.filter((_, i) => i !== index)))
+            .catch(error => console.error('Error removing task:', error));
     }
 
     const toggleComplete = (index) => {
         const newTasks = [...tasks];
-        newTasks[index].completed = !newTasks[index].completed;
+        newTasks[index].checked = !newTasks[index].checked;
         setTasks(newTasks);
+        axios.put(`https://mjkr94.pythonanywhere.com/api/update-checkbox/${newTasks[index].id}/`, { checked: newTasks[index].checked })
+            .catch(error => console.error('Error updating task status:', error));
     }
 
     const handleEdit = (task) => {
@@ -52,11 +62,15 @@ function ToDo() {
     }
 
     const handleUpdateTask = (newText) => {
-        const updatedTasks = tasks.map((t) =>
-            t === currentTask ? { ...t, text: newText } : t
-        );
-        setTasks(updatedTasks);
-        setIsEditing(false);
+        axios.put(`https://mjkr94.pythonanywhere.com/api/edit-item/${currentTask.id}/`, { text: newText })
+            .then(() => {
+                const updatedTasks = tasks.map((t) =>
+                    t.id === currentTask.id ? { ...t, text: newText } : t
+                );
+                setTasks(updatedTasks);
+                setIsEditing(false);
+            })
+            .catch(error => console.error('Error updating task:', error));
     }
 
     return (
@@ -77,8 +91,8 @@ function ToDo() {
             <ul>
                 {tasks.map((task, index) => (
                     <li
-                        key={index}
-                        className={task.completed ? 'checked' : ''}
+                        key={task.id}
+                        className={task.checked ? 'checked' : ''}
                         onClick={() => toggleComplete(index)}
                     >
                         {task.text}
