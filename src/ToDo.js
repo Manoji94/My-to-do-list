@@ -96,8 +96,8 @@ function ToDo() {
                         onClick={() => toggleComplete(index)}
                     >
                         {task.text}
-                        <span className='edit' onClick={(e) => { e.stopPropagation(); handleEdit(task); }}>EDIT</span>
-                        <span className='close' onClick={(e) => { e.stopPropagation(); handleRemove(index); }}>x</span>
+                        <span className='edit' onClick={(e) => { e.stopPropagation(); handleEdit(task); }}><i className="bi bi-pencil-square"></i></span>
+                        <span className='close' onClick={(e) => { e.stopPropagation(); handleRemove(index); }}><i className="bi bi-trash"></i></span>
                     </li>
                 ))}
             </ul>

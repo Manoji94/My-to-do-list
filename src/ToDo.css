@@ -113,7 +113,7 @@ body {
       right: 0px;
       top: 50%;
       transform: translateY(-50%);
-      padding: 10px 30px;
+      padding: 10px 20px;
       cursor: pointer;
       font-size: 20px;
       color: #555;
@@ -127,12 +127,12 @@ body {
   /* Add the edit button styling */
 .edit {
     position: absolute;
-    right: 70px;
+    right: 60px;
     top: 50%;
     transform: translateY(-50%);
     padding: 10px 20px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px;
     color: #555;
 }
 
