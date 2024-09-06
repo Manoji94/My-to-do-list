@@ -7,8 +7,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [token, setToken] = useState(null);
 
-    const handleLoginSuccess = () => {
+    const handleLoginSuccess = (token) => {
+        setToken(token);
         setIsAuthenticated(true);
     };
 
@@ -26,6 +28,7 @@ function App() {
 
     const handleLogout = () => {
         setIsAuthenticated(false);
+        setToken(null);
         // Optionally, clear tokens or user data from local storage here
     };
 
@@ -33,14 +36,20 @@ function App() {
         <div className="App">
             {!isAuthenticated ? (
                 isRegistering ? (
-                    <Register onRegisterSuccess={handleRegisterSuccess} onSwitchToLogin={handleSwitchToLogin} />
+                    <Register
+                        onRegisterSuccess={handleRegisterSuccess}
+                        onSwitchToLogin={handleSwitchToLogin}
+                    />
                 ) : (
-                    <Login onLoginSuccess={handleLoginSuccess} onSwitchToRegister={handleSwitchToRegister} />
+                    <Login
+                        onLoginSuccess={handleLoginSuccess}
+                        onSwitchToRegister={handleSwitchToRegister}
+                    />
                 )
             ) : (
                 <div>
-                    <ToDo />
-                    <button onClick={handleLogout}>Logout</button>
+                    <ToDo token={token} />
+                    <button className="btn btn-primary" onClick={handleLogout}>Logout</button>
                 </div>
             )}
         </div>

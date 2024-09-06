@@ -9,13 +9,14 @@ function Login({ onLoginSuccess, onSwitchToRegister }) {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post('https://mjkr94.pythonanywhere.com/accounts/login/', {
+            const response = await axios.post('https://mjkr94.pythonanywhere.com/api-token-auth/', {
                 username,
                 password,
             });
 
             if (response.status === 200) {
-                onLoginSuccess();
+                const { token } = response.data;
+                onLoginSuccess(token); // Pass token to App component
             }
         } catch (error) {
             setError('Login failed. Please check your credentials and try again.');

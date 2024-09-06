@@ -2,20 +2,27 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ToDo.css';
 
-function ToDo() {
+function ToDo({ token }) {
     const [task, setTask] = useState('');
     const [tasks, setTasks] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [currentTask, setCurrentTask] = useState(null);
 
-    // Use the production URL for the API
     const API_URL = 'https://mjkr94.pythonanywhere.com/api/react/';
 
+    // Set up Axios instance with the Authorization header
+    const axiosInstance = axios.create({
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    });
+
     useEffect(() => {
-        axios.get(API_URL)
+        // Fetch tasks on component mount
+        axiosInstance.get(API_URL)
             .then(response => setTasks(response.data))
             .catch(error => console.error('Error fetching tasks:', error));
-    }, []);
+    }, [API_URL, token]);
 
     const handleChange = (event) => {
         setTask(event.target.value);
@@ -27,7 +34,7 @@ function ToDo() {
             if (isEditing) {
                 handleUpdateTask(task);
             } else {
-                axios.post(API_URL, { text: task, checked: false })
+                axiosInstance.post(API_URL, { text: task, checked: false })
                     .then(response => setTasks([...tasks, response.data]))
                     .catch(error => console.error('Error adding task:', error));
             }
@@ -42,7 +49,7 @@ function ToDo() {
             setIsEditing(false);
             setTask('');
         }
-        axios.delete(`https://mjkr94.pythonanywhere.com/api/delete-item/${taskToRemove.id}/`)
+        axiosInstance.delete(`https://mjkr94.pythonanywhere.com/api/delete-item/${taskToRemove.id}/`)
             .then(() => setTasks(tasks.filter((_, i) => i !== index)))
             .catch(error => console.error('Error removing task:', error));
     }
@@ -51,7 +58,7 @@ function ToDo() {
         const newTasks = [...tasks];
         newTasks[index].checked = !newTasks[index].checked;
         setTasks(newTasks);
-        axios.put(`https://mjkr94.pythonanywhere.com/api/update-checkbox/${newTasks[index].id}/`, { checked: newTasks[index].checked })
+        axiosInstance.put(`https://mjkr94.pythonanywhere.com/api/update-checkbox/${newTasks[index].id}/`, { checked: newTasks[index].checked })
             .catch(error => console.error('Error updating task status:', error));
     }
 
@@ -62,7 +69,7 @@ function ToDo() {
     }
 
     const handleUpdateTask = (newText) => {
-        axios.put(`https://mjkr94.pythonanywhere.com/api/edit-item/${currentTask.id}/`, { text: newText })
+        axiosInstance.put(`https://mjkr94.pythonanywhere.com/api/edit-item/${currentTask.id}/`, { text: newText })
             .then(() => {
                 const updatedTasks = tasks.map((t) =>
                     t.id === currentTask.id ? { ...t, text: newText } : t
