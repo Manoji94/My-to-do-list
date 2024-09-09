@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ToDo.css';
 
-function ToDo({ token, username }) {
+function ToDo({ token }) {
     const [task, setTask] = useState('');
     const [tasks, setTasks] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
@@ -83,9 +83,6 @@ function ToDo({ token, username }) {
     return (
         <div>
             <div className="todo-header">
-                    <div className="text-end">
-                        <h2 className="font-weight-bold text-white">{username}</h2>
-                    </div>
                 <h1>Listify</h1>
                 <form onSubmit={handleSubmit}>
                     <input
