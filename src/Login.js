@@ -16,7 +16,7 @@ function Login({ onLoginSuccess, onSwitchToRegister }) {
 
             if (response.status === 200) {
                 const { token } = response.data;
-                onLoginSuccess(token); // Pass token to App component
+                onLoginSuccess(token, username); // Pass token to App component
             }
         } catch (error) {
             setError('Login failed. Please check your credentials and try again.');
